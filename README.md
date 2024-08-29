@@ -9,7 +9,7 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
 - `--readme `                   **显示极为详细的使用说明(可以重定向到README.md)**
 - `-l, --list`                  **列出所有历史工作流(以及当前MODULE名称)**
 - `--clean`                     **清除所有备份($WF/backup)**
-- `--makeup`                    **实际控制OPTIONAL_MAKEUP变量**
+- `--backup`                    **实际控制OPTIONAL_MAKEUP变量**
     - `yes`     使用默认
     - `no`      不备份(仅适用于切换旧工作流时不备份)
     - `tar`     打包备份(默认)
@@ -52,7 +52,7 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
    │   ├── marco.h
    │   ├── top.cpp
    │   └── utils.cpp
-   ├── changeflow.sh
+   ├── .changeflowrc
    └── vsrc
        ├── TEMPLATE.v
        └── top.v
@@ -86,7 +86,7 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
    ├── csrc
    │   ├── adder.cpp
    │   └── marco.h
-   ├── changeflow.sh
+   ├── .changeflowrc
    └── vsrc
        └── add.v
    ```
@@ -120,7 +120,7 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
    │   ├── marco.h
    │   ├── top.cpp
    │   └── utils.cpp
-   ├── changeflow.sh
+   ├── .changeflowrc
    └── vsrc
        ├── TEMPLATE.v
        └── top.v
@@ -129,7 +129,7 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
 ## 其他说明
 
 - **无修改时不备份**：如果在新创建的工作流中没有进行任何修改，切换或创建下一个工作流时，脚本不会进行备份操作。
-- **强制备份**：即使设置了 `--makeup no` 参数，遇到冲突操作时，脚本仍会进行强制备份，以避免数据丢失。
+- **强制备份**：即使设置了 `--backup no` 参数，遇到冲突操作时，脚本仍会进行强制备份，以避免数据丢失。
 - **删除工作流**：出于安全考虑，脚本不支持直接删除工作流的操作。如果需要删除某个工作流，需要手动进行。
 
 
