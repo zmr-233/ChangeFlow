@@ -790,7 +790,8 @@ _list_workflows() {
 
 _gen_git(){
     TEST_DIR=$(mktemp -d -t CHANGEFLOW_XXXXXX)
-    mkdir -p "$TEST_DIR/changeflow"
+    # mkdir -p "$TEST_DIR/changeflow"
+    git clone git@github.com:zmr-233/ChangeFlow.git $TEST_DIR/changeflow
     {
         cat "$0"
     } > "$TEST_DIR/changeflow/changeflow.sh"
@@ -808,6 +809,8 @@ alias cflow=switchwf
 QWE
 
     echo "cd $TEST_DIR/changeflow"
+
+
 }
 
 # 显示英文帮助信息
