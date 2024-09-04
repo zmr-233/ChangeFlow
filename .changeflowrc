@@ -800,9 +800,9 @@ local RDIR=$(mktemp -d -t CHANGEFLOW_XXXXXX)
 README_PATH="$RDIR/README.md"
 [ ! -z "$README_PATH" ] && echo "" > $README_PATH
 
-__generate_changeflow_test
+__generate_changeflow_test &> /dev/null
 
-# cat $README_PATH
+cat $README_PATH
 cat << 'EOF'
 
 ## 其他说明
