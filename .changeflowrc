@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ChangeFlowVERSION="2.0"
+# 项目地址: https://github.com/zmr-233/ChangeFlow/tree/main
+ChangeFlowVERSION="2.2"
 
 # ==========加载.libbash函数库==========
 source $HOME/libbash/libbash.sh
@@ -61,6 +62,39 @@ _check_empty_dir() {
     done
 
     return 0  # 目录为空
+}
+
+# 递归删除空目录的函数
+recursive_remove_empty_dirs() {
+    local dir=$1
+
+    # 检查目录是否存在
+    if [[ ! -d $dir ]]; then
+        ERROR "Directory '$dir' does not exist."
+        return 1
+    fi
+
+    # 遍历目录中的所有项
+    local empty=true
+    for item in "$dir"/* "$dir"/.[!.]* "$dir"/..?*; do
+        if [ -e "$item" ]; then
+            empty=false
+            # 如果是目录，递归调用函数
+            if [ -d "$item" ]; then
+                recursive_remove_empty_dirs "$item" || return 1
+            else
+                # 如果找到文件，报错并退出
+                ERROR "Non-empty directory found at '$dir'"
+                return 1
+            fi
+        fi
+    done
+
+    # 如果目录为空，则删除
+    if [ "$empty" = true ]; then
+        INFO "Removing empty directory: $dir"
+        rmdir "$dir"
+    fi
 }
 
 # A.保存当前工作流
@@ -150,7 +184,12 @@ _changeflow_B(){
         fi
 
         operateMapFiles move workflow_map "$WF/$TARN" "." "$WF/backup"
-        rmdir $WF/$TARN # 经常用于检查错误
+        # rmdir $WF/$TARN
+        # [ -d $WF/$TARN ] && 
+        recursive_remove_empty_dirs $WF/$TARN
+        [ -d $WF/$TARN ] && rmdir $WF/$TARN
+
+        return 0
     else
         #v1.1修改: 3.现在，当目标工作流不存在的时候，会查看.workflows下是否有MODULE.cfg文件作为默认的工作流配置文件
         source $WF/MODULE.cfg
@@ -413,7 +452,7 @@ list_backups() {
     fi
 
     # 按照时间戳排序
-    local backups=($(ls -1 $BACKUP_DIR | sort))
+    local backups=($(ls -1 $BACKUP_DIR | sort -r))
     local filtered_backups_A=() # 用于存储原始备份文件名
     local filtered_backups_B=() # 用于存储格式化后的备份信息
 
@@ -424,7 +463,7 @@ list_backups() {
         workflow_name="${workflow_name%%.*}"
 
         # 模糊匹配模块名
-        if [[ $workflow_name =~ $moduleName ]]; then
+        if [[ ! -d "$BACKUP_DIR/$file" ]] && [[ $workflow_name =~ $moduleName ]]; then
             year=${timestamp:0:4}
             month=${timestamp:4:2}
             day=${timestamp:6:2}
@@ -527,7 +566,7 @@ __test_eval_CMD(){
         elif [[ $CMDLINE == "RET" ]]; then
             return 0
         else
-            eval "CFLOW=\"bash $HOME/.changeflowrc\" && $CMDLINE"
+            eval "CFL=\"bash $HOME/.changeflowrc\" && $CMDLINE"
         fi
     done
 }
@@ -621,6 +660,7 @@ __generate_changeflow_test(){
 # [ ! -z "$README_PATH" ] && echo "" > README_PATH
 DEBUG '==================测试开始=================='
 pushd $TDIR > /dev/null
+[ -z "$README_PATH" ] && INFO "cd $(pwd)"
 #==============================================================================
 ___________________DEBUG "cflow --init初始化.workflows"
 ___________________INFO '创建了一个MODULE.cfg的模板文件和一个空文件夹' "y"
@@ -729,7 +769,7 @@ ___________________INFO "Command : \`cflow -r\`"
 __test_CMD  "Backups, sorted by time: \n1) 2024/09/05 05:34:26 B \n2) 2024/09/05 05:34:26 B_clone \n3) 2024/09/05 05:34:27 A_v0 \n4) 2024/09/05 05:34:27 A_v0_clone \n5) 2024/09/05 05:34:27 B \n6) 2024/09/05 05:34:27 DELETE_A_over \n7) 2024/09/05 05:34:27 DELETE_B \n#? Selected: 20240905053426.wf_B.tar.gz    Restore to: B_00 <==INACCURATE \nDue to the current MODULE, the 00 might be added one to avoid conflict." "bash"
 ___________________INFO "如果你需要恢复，也可以使用\`-r B\`限定模糊匹配只与B相关的，并可能看到如下列表"
 echo -e "1\nn\n" | CFLOWN -r B
-___________________INFO " Backups for module 'B', sorted by time: \n1) 2024/09/05 05:44:32 B \n2) 2024/09/05 05:44:32 B_clone \n3) 2024/09/05 05:44:33 B \n4) 2024/09/05 05:44:33 DELETE_B \n#? Selected: 20240905054432.wf_B.tar.gz    Restore to: B_00 <==INACCURATE \nDue to the current MODULE, the 00 might be added one to avoid conflict.  " "bash"
+__test_CMD "Backups for module 'B', sorted by time: \n1) 2024/09/05 05:44:32 B \n2) 2024/09/05 05:44:32 B_clone \n3) 2024/09/05 05:44:33 B \n4) 2024/09/05 05:44:33 DELETE_B \n#? Selected: 20240905054432.wf_B.tar.gz    Restore to: B_00 <==INACCURATE \nDue to the current MODULE, the 00 might be added one to avoid conflict.  " "bash"
 ___________________INFO "这里直接选择恢复工作流\`B\`，然后被删除的工作流就又回来了"
 __test_tree 4 y
 #==============================================================================
@@ -1004,7 +1044,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -l|--list|-list)
             INFO "Listing all historical workflows ..."
-            nECHO YELLOW "======> " ; nECHO GREEN_BOLD "$MODULE";  nECHO YELLOW " <======\n"
+            if [ -f MODULE.cfg ]; then
+                ____MODULE=$(awk -F '=' '/^MODULE=/{print $2}' MODULE.cfg)
+                nECHO YELLOW "======> " ; nECHO GREEN_BOLD "$____MODULE";  nECHO YELLOW " <======\n"
+            fi
             list_workflows
             [ -z $SELECT_EXETYPE ] && exit 0
             ;;
@@ -1199,7 +1242,7 @@ fi
 if [ -z "$SELECT_EXETYPE" ]; then
     SELECT_EXETYPE="change_workflow"
 fi
-DEBUG "$SELECT_EXETYPE $CURRENT_WORKFLOW $TARGET_WORKFLOW $TARGET_TARFILE"
+# DEBUG "$SELECT_EXETYPE $CURRENT_WORKFLOW $TARGET_WORKFLOW $TARGET_TARFILE"
 $SELECT_EXETYPE "$CURRENT_WORKFLOW" "$TARGET_WORKFLOW" "$TARGET_TARFILE"
 if [[ $? -ne 0 ]]; then
     ERROR "$SELECT_EXETYPE $CURRENT_WORKFLOW $TARGET_WORKFLOW $TARGET_TARFILE =====FAILED====="

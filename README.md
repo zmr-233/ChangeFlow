@@ -1,4 +1,4 @@
-# ChangeFlow / cflow 2.0 Document
+# ChangeFlow / cflow 2.2 Document
 
 changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具，它介于手动管理和 git 管理之间，虽然提供了一种轻量化的解决方案，但却功能完备实用性强。
 
@@ -503,13 +503,12 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
 	│   ├── MODULE.cfg
 	│   ├── Makefile
 	│   ├── backup
-	│   │   ├── 20240905065610.wf_A_v0.tar.gz
-	│   │   ├── 20240905065610.wf_B.tar.gz
-	│   │   ├── 20240905065610.wf_B_clone.tar.gz
-	│   │   ├── 20240905065611.wf_A_v0_clone.tar.gz
-	│   │   ├── 20240905065611.wf_B.tar.gz
-	│   │   ├── 20240905065611.wf_DELETE_A_over.tar.gz
-	│   │   └── 20240905065611.wf_DELETE_B.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0_clone.tar.gz
+	│   │   ├── 20240905083914.wf_B.tar.gz
+	│   │   ├── 20240905083914.wf_B_clone.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_A_over.tar.gz
+	│   │   └── 20240905083914.wf_DELETE_B.tar.gz
 	│   ├── csrc
 	│   │   └── marco.h
 	│   ├── vsrc
@@ -545,13 +544,15 @@ changeflow | cflow 是一个用于轻松切换和管理工作流的脚本工具�
 
 	Command : `cflow -r B`
 
-	 Backups for module 'B', sorted by time: 
-1) 2024/09/05 05:44:32 B 
-2) 2024/09/05 05:44:32 B_clone 
-3) 2024/09/05 05:44:33 B 
-4) 2024/09/05 05:44:33 DELETE_B 
-#? Selected: 20240905054432.wf_B.tar.gz    Restore to: B_00 <==INACCURATE 
-Due to the current MODULE, the 00 might be added one to avoid conflict.  
+	```bash
+	Backups for module 'B', sorted by time: 
+	1) 2024/09/05 05:44:32 B 
+	2) 2024/09/05 05:44:32 B_clone 
+	3) 2024/09/05 05:44:33 B 
+	4) 2024/09/05 05:44:33 DELETE_B 
+	#? Selected: 20240905054432.wf_B.tar.gz    Restore to: B_00 <==INACCURATE 
+	Due to the current MODULE, the 00 might be added one to avoid conflict.  
+	```
 
 	这里直接选择恢复工作流`B`，然后被删除的工作流就又回来了
 
@@ -561,14 +562,13 @@ Due to the current MODULE, the 00 might be added one to avoid conflict.
 	│   ├── MODULE.cfg
 	│   ├── Makefile
 	│   ├── backup
-	│   │   ├── 20240905065610.wf_A_v0.tar.gz
-	│   │   ├── 20240905065610.wf_B.tar.gz
-	│   │   ├── 20240905065610.wf_B_clone.tar.gz
-	│   │   ├── 20240905065611.wf_A_v0_clone.tar.gz
-	│   │   ├── 20240905065611.wf_B.tar.gz
-	│   │   ├── 20240905065611.wf_B_00.tar.gz
-	│   │   ├── 20240905065611.wf_DELETE_A_over.tar.gz
-	│   │   └── 20240905065611.wf_DELETE_B.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0_clone.tar.gz
+	│   │   ├── 20240905083914.wf_B.tar.gz
+	│   │   ├── 20240905083914.wf_B_clone.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_A_over.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_B.tar.gz
+	│   │   └── 20240905083914.wf_DELETE_B_00.tar.gz
 	│   ├── csrc
 	│   │   └── marco.h
 	│   ├── vsrc
@@ -583,12 +583,9 @@ Due to the current MODULE, the 00 might be added one to avoid conflict.
 	├── MODULE.cfg
 	├── Makefile
 	├── csrc
-	│   ├── B.cpp
-	│   ├── Just_for_fun.cpp
-	│   └── marco.h
+	│   └── B_over.cpp
 	└── vsrc
-	    ├── B.v
-	    └── TEMPLATE.v
+	    └── B_over.v
 	```
 
 12. **cflow -s / --save 仅保存备份不切换目录**
@@ -605,14 +602,14 @@ Due to the current MODULE, the 00 might be added one to avoid conflict.
 	│   ├── MODULE.cfg
 	│   ├── Makefile
 	│   ├── backup
-	│   │   ├── 20240905065610.wf_A_v0.tar.gz
-	│   │   ├── 20240905065610.wf_B.tar.gz
-	│   │   ├── 20240905065610.wf_B_clone.tar.gz
-	│   │   ├── 20240905065611.wf_A_v0_clone.tar.gz
-	│   │   ├── 20240905065611.wf_B.tar.gz
-	│   │   ├── 20240905065611.wf_B_00.tar.gz
-	│   │   ├── 20240905065611.wf_DELETE_A_over.tar.gz
-	│   │   └── 20240905065611.wf_DELETE_B.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0.tar.gz
+	│   │   ├── 20240905083914.wf_A_v0_clone.tar.gz
+	│   │   ├── 20240905083914.wf_B.tar.gz
+	│   │   ├── 20240905083914.wf_B_clone.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_A_over.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_B.tar.gz
+	│   │   ├── 20240905083914.wf_DELETE_B_00.tar.gz
+	│   │   └── 20240905083915.wf_B.tar.gz
 	│   ├── csrc
 	│   │   └── marco.h
 	│   ├── vsrc
@@ -627,12 +624,9 @@ Due to the current MODULE, the 00 might be added one to avoid conflict.
 	├── MODULE.cfg
 	├── Makefile
 	├── csrc
-	│   ├── B.cpp
-	│   ├── Just_for_fun.cpp
-	│   └── marco.h
+	│   └── B_over.cpp
 	└── vsrc
-	    ├── B.v
-	    └── TEMPLATE.v
+	    └── B_over.v
 	```
 
 13. **cflow --clean-backup 删除备份目录**
